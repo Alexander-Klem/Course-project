@@ -37,7 +37,7 @@ const InventoryField = sequelize.define('inventory_field', {
 const Item = sequelize.define('item', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     customId: { type: DataTypes.STRING, allowNull: false },
-    createdAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
+    // createdAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
     singleLine1: {type: DataTypes.STRING, allowNull: true},
     singleLine2: {type: DataTypes.STRING, allowNull: true},
     singleLine3: {type: DataTypes.STRING, allowNull: true },
