@@ -130,7 +130,6 @@ class InventoryController {
     async delete(req, res, next) { 
         try {
             const { id } = req.params;
-            console.log(id);
             const inventory = await Inventory.findOne({ where: { id } });
 
             if (!inventory) { 
