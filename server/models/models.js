@@ -84,6 +84,11 @@ const DiscussionPost = sequelize.define('discussion_post', {
 // Access table
 const InventoryAccess = sequelize.define('inventory_access', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    accessLevel: {
+        type: DataTypes.STRING,
+        defaultValue: 'READ',
+        validate: { isIn: [['READ', 'WRITE']] }
+    }
 });
 
 

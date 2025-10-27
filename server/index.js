@@ -7,6 +7,7 @@ const userRouter = require('./routes/userRouter');
 const inventoryRouter = require('./routes/inventoryRouter');
 const inventoryFieldRouter = require('./routes/inventoryFieldRouter');
 const itemRouter = require('./routes/itemRouter');
+const inventoryAccessRouter = require('./routes/inventoryAccessRouter');
 const errorHandler = require('./middleware/ErrorHandlingMiddleware');
 
 const PORT = process.env.PORT || 7000;
@@ -18,6 +19,7 @@ app.use('/api', userRouter);
 app.use('/api/inventory', inventoryRouter);
 app.use('/api/inventory-fields', inventoryFieldRouter);
 app.use('/api/items', itemRouter);
+app.use('/api/inventory-access', inventoryAccessRouter);
 
 //Error handling, last Middleware
 app.use(errorHandler);
@@ -30,7 +32,7 @@ const start = async () => {
         // await sequelize.sync({ force: true });
         app.listen(PORT, () => console.log(`Server started on PORT: ${PORT}`));
     } catch (error) { 
-        console.error('Unable to connect:', error);
+        console.error('Unable to connect:', error.message);
     }
 }
 
