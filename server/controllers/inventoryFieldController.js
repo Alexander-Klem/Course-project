@@ -19,6 +19,11 @@ class inventoryFieldController {
                 return next(ApiError.forbidden('У вас нет прав для создания полей'))
             }
 
+            const existingField = await InventoryField.findOne({ where: { inventoryId, title } });
+            if (existingField) {
+                return next(ApiError.badRequest('Поле с таким названием уже существует в инвентаре'));
+            }
+
             const field = await InventoryField.create({
                 title,
                 description,
@@ -38,13 +43,13 @@ class inventoryFieldController {
             const { inventoryId } = req.params;
             const fields = await InventoryField.findAll({
                 where: { inventoryId },
-                attributes: [
-                    'id',
-                    'title',
-                    'description',
-                    'type',
-                    'isShownInTable' 
-                ]
+                // attributes: [
+                //     'id',
+                //     'title',
+                //     'description',
+                //     'type',
+                //     'isShownInTable' 
+                // ]
             })
             return res.json(fields);
         } catch (error) {

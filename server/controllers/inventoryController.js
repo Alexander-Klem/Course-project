@@ -35,7 +35,7 @@ class InventoryController {
 
             return res.json(inventory);
         } catch (error) {
-            return next(ApiError.badRequest(`Ошибка при создании инвентаря`))
+            return next(ApiError.badRequest(error.message))
         }
     }
     
@@ -114,7 +114,7 @@ class InventoryController {
                 description,
                 category,
                 isPublic,
-                versionInventory,
+                version: versionInventory,
                 imageUrl,
                 tags,
                 customIdFormat

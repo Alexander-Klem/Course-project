@@ -21,7 +21,7 @@ const Inventory = sequelize.define('inventory', {
     version: { type: DataTypes.INTEGER, defaultValue: 1 }, //?
     imageUrl: { type: DataTypes.STRING, allowNull: true }, //
     tags: { type: DataTypes.JSON, defaultValue: [] }, //
-    customIdFormat: { type: DataTypes.JSON, defaultValue: [] } // Формат кастомных ID
+    customIdFormat: { type: DataTypes.STRING, defaultValue: 'item-{id}' } // Формат кастомных ID
 });
 
 // Table of custom fields for inventory
@@ -38,6 +38,22 @@ const Item = sequelize.define('item', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     customId: { type: DataTypes.STRING, allowNull: false },
     // createdAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
+    inventoryId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+            model: Inventory,
+            key: 'id'
+        }
+    },
+    userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+            model: User,
+            key: 'id'
+        }
+    },
     singleLine1: {type: DataTypes.STRING, allowNull: true},
     singleLine2: {type: DataTypes.STRING, allowNull: true},
     singleLine3: {type: DataTypes.STRING, allowNull: true },
