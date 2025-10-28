@@ -38,22 +38,22 @@ const Item = sequelize.define('item', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     customId: { type: DataTypes.STRING, allowNull: false },
     // createdAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
-    inventoryId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-            model: Inventory,
-            key: 'id'
-        }
-    },
-    userId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-            model: User,
-            key: 'id'
-        }
-    },
+    // inventoryId: {
+    //     type: DataTypes.INTEGER,
+    //     allowNull: false,
+    //     references: {
+    //         model: Inventory,
+    //         key: 'id'
+    //     }
+    // },
+    // userId: {
+    //     type: DataTypes.INTEGER,
+    //     allowNull: false,
+    //     references: {
+    //         model: User,
+    //         key: 'id'
+    //     }
+    // },
     singleLine1: {type: DataTypes.STRING, allowNull: true},
     singleLine2: {type: DataTypes.STRING, allowNull: true},
     singleLine3: {type: DataTypes.STRING, allowNull: true },
@@ -77,7 +77,7 @@ const DiscussionPost = sequelize.define('discussion_post', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     content: { type: DataTypes.TEXT, allowNull: false },
     likes: { type: DataTypes.JSON, defaultValue: {} },
-    createdAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
+    // createdAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
 });
 
 
