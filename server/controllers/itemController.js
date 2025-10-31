@@ -1,5 +1,6 @@
 const ApiError = require('../error/ApiError');
 const { Item, Inventory } = require('../models/models');
+const uuid = require('uuid');
 
 class ItemController { 
     async create(req, res, next) { 
@@ -15,14 +16,30 @@ class ItemController {
                 return next(ApiError.forbidden('Нет прав'));
             }
 
+            let format = inventory.customIdFormat;
             const nextId = await Item.count({ where: { inventoryId: inventoryId } }) + 1;
-            let customIdFormat = inventory.customIdFormat;
+            let customId;
 
-            if (!customIdFormat || typeof customIdFormat !== 'string') { 
-                customIdFormat = 'item-{id}'
+
+            if (!format || typeof format !== 'string') { 
+                format = 'item-{id}'
             }
 
-            const customId = customIdFormat.replace('{id}', nextId);
+            if (format.includes('{id}')) {
+                customId = format.replace('{id}', nextId)
+            } else if (format.includes('{random}')) {
+                const random = Math.floor(Math.random() * 100000)
+                customId = format.replace('{random}', random);
+            } else if (format.includes('{guid}')) {
+                customId = format.replace('{guid}', uuid.v4());
+            } else if (format.includes('{date}')) {
+                const date = new Date().toISOString().split('T')[0];
+                customId = format.replace('{date}', date);
+            } else { 
+                customId = format;
+            }
+
+            // customId = customIdFormat.replace('{id}', nextId);
 
             const existingItem = await Item.findOne({
                 where: { inventoryId: inventoryId, customId }

@@ -5,8 +5,8 @@ const authMiddleware = require('../middleware/authMiddleware');
 
 router.post('/:inventoryId', authMiddleware, itemController.create);
 router.get('/:inventoryId', authMiddleware, itemController.getAll);
-router.get('/:id', authMiddleware, itemController.getOne);
-router.put('/:id', authMiddleware, itemController.update);
-router.delete('/:id', authMiddleware, itemController.delete);
+router.get('/item/:id', authMiddleware, itemController.getOne);
+router.put('/item/:id', authMiddleware, itemController.update);
+router.delete('/item/:id', authMiddleware, itemController.delete);
 
 module.exports = router;

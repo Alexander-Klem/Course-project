@@ -38,22 +38,22 @@ const Item = sequelize.define('item', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     customId: { type: DataTypes.STRING, allowNull: false },
     // createdAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
-    // inventoryId: {
-    //     type: DataTypes.INTEGER,
-    //     allowNull: false,
-    //     references: {
-    //         model: Inventory,
-    //         key: 'id'
-    //     }
-    // },
-    // userId: {
-    //     type: DataTypes.INTEGER,
-    //     allowNull: false,
-    //     references: {
-    //         model: User,
-    //         key: 'id'
-    //     }
-    // },
+    inventoryId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+            model: Inventory,
+            key: 'id'
+        }
+    },
+    userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+            model: User,
+            key: 'id'
+        }
+    },
     singleLine1: {type: DataTypes.STRING, allowNull: true},
     singleLine2: {type: DataTypes.STRING, allowNull: true},
     singleLine3: {type: DataTypes.STRING, allowNull: true },
@@ -68,7 +68,14 @@ const Item = sequelize.define('item', {
     imageLink3: {type: DataTypes.STRING, allowNull: true },
     boolean1: {type: DataTypes.BOOLEAN, allowNull: true},
     boolean2: {type: DataTypes.BOOLEAN, allowNull: true},
-    boolean3: {type: DataTypes.BOOLEAN, allowNull: true},
+    boolean3: { type: DataTypes.BOOLEAN, allowNull: true },
+}, {
+    indexes: [
+        {
+            unique: true,
+            fields: ['inventoryId', 'customId']
+        }
+    ]
 });
 
 
