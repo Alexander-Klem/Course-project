@@ -52,6 +52,22 @@ class UserController {
         const token = generateJwt(req.user.id, req.user.email, req.user.role, req.user.language, req.user.theme);
         return res.json({ token });
     }
+
+    async delete(req, res, next) { 
+        try {
+        const userId = req.user.id; // берём id из токена (middleware authMiddleware)
+        const user = await User.findOne({ where: { id: userId } });
+
+        if (!user) {
+            return next(ApiError.badRequest('Пользователь не найден'));
+        }
+
+        await user.destroy();
+        return res.json({ message: 'Пользователь успешно удалён' });
+    } catch (error) {
+        return next(ApiError.internal('Ошибка при удалении пользователя'));
+    }
+    }
 }
 
 module.exports = new UserController();

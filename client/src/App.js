@@ -1,9 +1,9 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, useFetcher } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-// import Register from './pages/Auth';
-// import Login from './pages/Login';
+import { ToastContainer } from 'react-toastify';
 
 import Auth from './pages/Auth';
+import Home from './pages/Home';
 
 import './App.css';
 
@@ -11,18 +11,26 @@ function App() {
 
   const [token, setToken] = useState(localStorage.getItem('token'));
 
-  useEffect(() => { 
-    setToken(localStorage.getItem('token'))
-  }, [])
+  useEffect(() => {
+    const handleStorage = () => {
+      setToken(localStorage.getItem('token'));
+    };
+
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
 
   return (
-    <Router>
-      <Routes>
-        <Route path='/register' element={<Auth/>} />
-        <Route path='/login' element={<Auth/>} />
-        <Route path='/' element={token ? <h1>Главная (вход выполнен успешно)</h1> : <Navigate to='/login' />} />
-      </Routes>
-    </Router>
+    <>
+      <Router>
+        <Routes>
+          <Route path='/register' element={<Auth setToken={setToken} />} />
+          <Route path='/login' element={<Auth setToken={setToken}/>} />
+          <Route path='/' element={token ? <Home/> : <Navigate to='/login' />} />
+        </Routes>
+      </Router>
+      <ToastContainer />
+    </>
   );
 }
 
