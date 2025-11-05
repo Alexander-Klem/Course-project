@@ -1,73 +1,125 @@
-const ApiError = require('../error/ApiError');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const { User } = require('../models/models');
+const ApiError = require("../error/ApiError");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { User } = require("../models/models");
 
 const generateJwt = (id, email, role, language, theme) => {
-    return jwt.sign(
-        { id, email, role, language, theme },
-        process.env.SECRET_KEY,
-        { expiresIn: '24h' }
-    );
+  return jwt.sign(
+    { id, email, role, language, theme },
+    process.env.SECRET_KEY,
+    { expiresIn: "24h" }
+  );
 };
 
-class UserController { 
-    async registration(req, res, next) { 
-        const { email, password, role, language, theme } = req.body;
-        if (!email || !password) { 
-            return next(ApiError.badRequest('Некорректный email или password'));
-        }
-
-        const candidate = await User.findOne({ where: { email } });
-
-        if (candidate) { 
-            return next(ApiError.badRequest('Пользователь с таким email уже существует'));
-        }
-
-        const hashPassword = await bcrypt.hash(password, 5);
-        const user = await User.create({ email, password: hashPassword, role, language, theme });
-        const token = generateJwt(user.id, user.email, user.role, user.language, user.theme)
-        return res.json({token})
-    }
-    
-    async login (req, res, next) {
-        const { email, password } = req.body;
-        const user = await User.findOne({ where: { email } });
-
-        if (!user) { 
-            return next(ApiError.internal('Пользователь не найден'))
-        }
-
-        let comparePassword = bcrypt.compareSync(password, user.password);
-
-        if (!comparePassword) { 
-            return next(ApiError.internal('Указан неверный пароль'))
-        }
-
-        const token = generateJwt(user.id, user.email, user.role, user.language, user.theme);
-        return res.json({ token });
+class UserController {
+  async registration(req, res, next) {
+    const { email, password, role, language, theme } = req.body;
+    if (!email || !password) {
+      return next(ApiError.badRequest("Некорректный email или password"));
     }
 
-    async auth (req, res, next) {
-        const token = generateJwt(req.user.id, req.user.email, req.user.role, req.user.language, req.user.theme);
-        return res.json({ token });
+    const candidate = await User.findOne({ where: { email } });
+
+    if (candidate) {
+      return next(
+        ApiError.badRequest("Пользователь с таким email уже существует")
+      );
     }
 
-    async delete(req, res, next) { 
-        try {
-        const userId = req.user.id; // берём id из токена (middleware authMiddleware)
-        const user = await User.findOne({ where: { id: userId } });
+    const validRoles = ["user", "admin"];
+    const userRole = validRoles.includes(role) ? role : "user";
 
-        if (!user) {
-            return next(ApiError.badRequest('Пользователь не найден'));
-        }
+    const hashPassword = await bcrypt.hash(password, 5);
+    const user = await User.create({
+      email,
+      password: hashPassword,
+      role: userRole,
+      language,
+      theme,
+    });
+    const token = generateJwt(
+      user.id,
+      user.email,
+      user.role,
+      user.language,
+      user.theme
+    );
+    return res.json({ token });
+  }
 
-        await user.destroy();
-        return res.json({ message: 'Пользователь успешно удалён' });
+  async login(req, res, next) {
+    const { email, password } = req.body;
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      return next(ApiError.internal("Пользователь не найден"));
+    }
+
+    let comparePassword = bcrypt.compareSync(password, user.password);
+
+    if (!comparePassword) {
+      return next(ApiError.internal("Указан неверный пароль"));
+    }
+
+    const token = generateJwt(
+      user.id,
+      user.email,
+      user.role,
+      user.language,
+      user.theme
+    );
+    return res.json({ token });
+  }
+
+  async auth(req, res, next) {
+    const token = generateJwt(
+      req.user.id,
+      req.user.email,
+      req.user.role,
+      req.user.language,
+      req.user.theme
+    );
+    return res.json({ token });
+  }
+
+  async delete(req, res, next) {
+    try {
+      const userId = req.user.id;
+      const user = await User.findOne({ where: { id: userId } });
+
+      if (!user) {
+        return next(ApiError.badRequest("Пользователь не найден"));
+      }
+
+      await user.destroy();
+      return res.json({ message: "Пользователь успешно удалён" });
     } catch (error) {
-        return next(ApiError.internal('Ошибка при удалении пользователя'));
+      return next(ApiError.internal("Ошибка при удалении пользователя"));
     }
+  }
+
+  async exitAdmin(req, res) {
+    const user = await User.findByPk(req.user.id);
+    if (!user) {
+      return next(ApiError.badRequest("Пользователь не найден"));
     }
+
+    if (user.role !== "admin") {
+      return res.json({ message: "Уже не админ" });
+    }
+
+    user.role = "user";
+    await user.save();
+
+    const token = generateJwt(
+      user.id,
+      user.email,
+      "user",
+      user.language,
+      user.theme
+    );
+    return res.json({ token, message: "Вы вышли из режима админа" });
+  }
 }
 
 module.exports = new UserController();

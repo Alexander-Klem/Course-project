@@ -24,14 +24,6 @@ const Inventory = sequelize.define('inventory', {
     customIdFormat: { type: DataTypes.STRING, defaultValue: 'item-{id}' } // Формат кастомных ID
 });
 
-// Table of custom fields for inventory
-const InventoryField = sequelize.define('inventory_field', {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    title: { type: DataTypes.STRING, allowNull: false },
-    description: { type: DataTypes.TEXT, allowNull: true },
-    type: { type: DataTypes.STRING, allowNull: true },
-    isShownInTable: { type: DataTypes.BOOLEAN, defaultValue: true }
-});
 
 // Inventory item table
 const Item = sequelize.define('item', {
@@ -69,24 +61,14 @@ const Item = sequelize.define('item', {
     boolean1: {type: DataTypes.BOOLEAN, allowNull: true},
     boolean2: {type: DataTypes.BOOLEAN, allowNull: true},
     boolean3: { type: DataTypes.BOOLEAN, allowNull: true },
-}, {
-    indexes: [
-        {
-            unique: true,
-            fields: ['inventoryId', 'customId']
-        }
-    ]
-});
-
-
-// Table of discussion posts
-const DiscussionPost = sequelize.define('discussion_post', {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    content: { type: DataTypes.TEXT, allowNull: false },
-    likes: { type: DataTypes.JSON, defaultValue: {} },
-    // createdAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
-});
-
+}, 
+    // {indexes: [
+    //     {
+    //         unique: true,
+    //         fields: ['inventoryId', 'customId']
+    //     }
+    // ]}
+);
 
 // Access table
 const InventoryAccess = sequelize.define('inventory_access', {
@@ -102,9 +84,6 @@ const InventoryAccess = sequelize.define('inventory_access', {
 User.hasMany(Inventory, {onDelete: 'CASCADE'});
 Inventory.belongsTo(User);
 
-Inventory.hasMany(InventoryField, {onDelete: 'CASCADE'});
-InventoryField.belongsTo(Inventory);
-
 Inventory.hasMany(Item, {onDelete: 'CASCADE'});
 Item.belongsTo(Inventory);
 
@@ -114,17 +93,10 @@ Item.belongsTo(User);
 User.belongsToMany(Inventory, { through: InventoryAccess });
 Inventory.belongsToMany(User, { through: InventoryAccess });
 
-Inventory.hasMany(DiscussionPost, {onDelete: 'CASCADE'});
-DiscussionPost.belongsTo(Inventory);
-
-User.hasMany(DiscussionPost, {onDelete: 'CASCADE'});
-DiscussionPost.belongsTo(User);
 
 module.exports = {
     User,
     Inventory,
-    InventoryField,
     Item,
     InventoryAccess,
-    DiscussionPost
 };

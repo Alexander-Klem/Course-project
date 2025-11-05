@@ -7,6 +7,6 @@ router.post('/:inventoryId', authMiddleware, itemController.create);
 router.get('/:inventoryId', authMiddleware, itemController.getAll);
 router.get('/item/:id', authMiddleware, itemController.getOne);
 router.put('/item/:id', authMiddleware, itemController.update);
-router.delete('/item/:id', authMiddleware, itemController.delete);
+router.delete('/:inventoryId/:id', authMiddleware, itemController.delete);
 
 module.exports = router;

@@ -4,6 +4,7 @@ import { ToastContainer } from 'react-toastify';
 
 import Auth from './pages/Auth';
 import Home from './pages/Home';
+import Inventory from './pages/Inventory';
 
 import './App.css';
 
@@ -26,7 +27,10 @@ function App() {
         <Routes>
           <Route path='/register' element={<Auth setToken={setToken} />} />
           <Route path='/login' element={<Auth setToken={setToken}/>} />
-          <Route path='/' element={token ? <Home/> : <Navigate to='/login' />} />
+          <Route path='/' element={token ? <Home /> : <Navigate to='/login' />} />
+          <Route path='/inventory/:id' element={<Inventory />}></Route>
+
+          <Route path='*' element={<Navigate to='/' />} />
         </Routes>
       </Router>
       <ToastContainer />

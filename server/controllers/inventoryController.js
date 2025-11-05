@@ -30,7 +30,6 @@ class InventoryController {
                 tags,
                 customIdFormat,
                 userId,
-                version: 1
             });
 
             return res.json(inventory);
@@ -42,7 +41,7 @@ class InventoryController {
     async getAll(req, res, next) { 
         try {
             const inventories = await Inventory.findAll({ 
-                attributes: ['id', 'title', 'category', 'isPublic', 'createdAt']
+                attributes: ['id', 'title', 'category', 'description', 'isPublic', 'createdAt']
             });
             return res.json(inventories);
         } catch (error) {
@@ -103,9 +102,9 @@ class InventoryController {
                 return next(ApiError.forbidden('У вас нет прав для редактирования'));
             }
 
-            if (version !== undefined && version !== inventory.version) { 
-                return next(ApiError.forbidden('Инвентарь был изменен другим пользователем'))
-            }
+            // if (version !== undefined && version !== inventory.version) { 
+            //     return next(ApiError.forbidden('Инвентарь был изменен другим пользователем'))
+            // }
 
             const versionInventory = inventory.version + 1;
 
@@ -136,9 +135,9 @@ class InventoryController {
                 return next(ApiError.badRequest('Инвентарь не найден'));
             }
 
-            if (inventory.userId !== req.user.id && req.user.role !== 'ADMIN') { 
-                return next(ApiError.forbidden('У вас нет прав для редактирования'));
-            }
+            // if (inventory.userId !== req.user.id && req.user.role !== 'ADMIN') { 
+            //     return next(ApiError.forbidden('У вас нет прав для редактирования'));
+            // }
 
             await inventory.destroy();
             return res.json({ message: 'Инвентарь удален' });
