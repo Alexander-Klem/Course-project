@@ -13,16 +13,12 @@
 
 const { Sequelize } = require('sequelize');
 
-// Внутренний URL PostgreSQL на Railway
-const urlDB = `postgresql://postgres:LMAHnETRSsDgRANKyKnSOoQAsdqIFRDo@postgres.railway.internal:5432/railway`;
-
-module.exports = new Sequelize(urlDB, {
+module.exports = new Sequelize(process.env.DATABASE_URL, {
   dialect: 'postgres',
   dialectOptions: {
     ssl: {
       require: true,
-      rejectUnauthorized: false  // Обязательно для Railway
+      rejectUnauthorized: false
     }
-  },
-  logging: false  // Убираем лишние логи
+  }
 });
