@@ -6,22 +6,22 @@ const User = sequelize.define('user', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     email: { type: DataTypes.STRING, unique: true, allowNull: false },
     password: { type: DataTypes.STRING, allowNull: false },
-    role: { type: DataTypes.STRING, defaultValue: 'USER' },
-    language: { type: DataTypes.STRING, defaultValue: 'en' },
-    theme: {type: DataTypes.STRING, defaultValue: 'light'}
+    role: { type: DataTypes.STRING },
+    language: { type: DataTypes.STRING },
+    theme: {type: DataTypes.STRING}
 });
 
 // Inventory table
 const Inventory = sequelize.define('inventory', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    title: { type: DataTypes.STRING, allowNull: false },
-    description: { type: DataTypes.TEXT, allowNull: true },
-    category: { type: DataTypes.STRING, allowNull: true },
-    isPublic: { type: DataTypes.BOOLEAN, defaultValue: false },
-    version: { type: DataTypes.INTEGER, defaultValue: 1 }, //?
-    imageUrl: { type: DataTypes.STRING, allowNull: true }, //
-    tags: { type: DataTypes.JSON, defaultValue: [] }, //
-    customIdFormat: { type: DataTypes.STRING, defaultValue: 'item-{id}' } // Формат кастомных ID
+    title: { type: DataTypes.STRING },
+    description: { type: DataTypes.TEXT },
+    category: { type: DataTypes.STRING },
+    isPublic: { type: DataTypes.BOOLEAN },
+    version: { type: DataTypes.INTEGER }, 
+    imageUrl: { type: DataTypes.STRING }, 
+    tags: { type: DataTypes.JSON, defaultValue: [] }, 
+    customIdFormat: { type: DataTypes.STRING, defaultValue: 'item-{id}' }
 });
 
 
@@ -29,7 +29,6 @@ const Inventory = sequelize.define('inventory', {
 const Item = sequelize.define('item', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     customId: { type: DataTypes.STRING, allowNull: false },
-    // createdAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
     inventoryId: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -61,14 +60,7 @@ const Item = sequelize.define('item', {
     boolean1: {type: DataTypes.BOOLEAN, allowNull: true},
     boolean2: {type: DataTypes.BOOLEAN, allowNull: true},
     boolean3: { type: DataTypes.BOOLEAN, allowNull: true },
-}, 
-    // {indexes: [
-    //     {
-    //         unique: true,
-    //         fields: ['inventoryId', 'customId']
-    //     }
-    // ]}
-);
+});
 
 // Access table
 const InventoryAccess = sequelize.define('inventory_access', {

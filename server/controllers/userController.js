@@ -108,8 +108,8 @@ class UserController {
       return res.json({ message: "Уже не админ" });
     }
 
-    user.role = "user";
-    await user.save();
+    // user.role = "user";
+    // await user.save();
 
     const token = generateJwt(
       user.id,
