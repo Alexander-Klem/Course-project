@@ -184,8 +184,7 @@ export default function Auth({ setToken }) {
                       style={{
                         position: "absolute",
                         right: "1rem",
-                        top: "70%",
-                        transform: "translateY(-50%)",
+                        top: "50%",
                         cursor: "pointer",
                         color: "#6c757d",
                         fontSize: "1.3rem",

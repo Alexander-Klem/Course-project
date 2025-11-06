@@ -5,6 +5,8 @@ import * as Yup from "yup";
 import api from "../services/api";
 import { toast } from "react-toastify";
 
+import { getUser } from "../utils/getUser";
+
 export default function Inventory() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -14,41 +16,41 @@ export default function Inventory() {
   const [modal, setModal] = useState(false);
   const [edit, setEdit] = useState(false);
   const [selected, setSelected] = useState(null);
+  const [currentUser, setCurrentUser] = useState({ id: null, role: "user" });
 
-  const [singleLine2, setSingleLine2] = useState(false);
-  const [singleLine3, setSingleLine3] = useState(false);
-  const [multiLine2, setMultiLine2] = useState(false);
-  const [multiLine3, setMultiLine3] = useState(false);
-  const [numeric2, setNumeric2] = useState(false);
-  const [numeric3, setNumeric3] = useState(false);
-  const [imageLink2, setImageLink2] = useState(false);
-  const [imageLink3, setImageLink3] = useState(false);
-  const [boolean2, setBoolean2] = useState(false);
-  const [boolean3, setBoolean3] = useState(false);
+  const [fields, setFields] = useState({
+      singleLine2: false,
+      singleLine3: false,
+      multiLine2: false,
+      multiLine3: false,
+      numeric2: false,
+      numeric3: false,
+      imageLink2: false,
+      imageLink3: false,
+      boolean2: false,
+      boolean3: false,
+  })
+
+  // const [singleLine2, setSingleLine2] = useState(false);
+  // const [singleLine3, setSingleLine3] = useState(false);
+  // const [multiLine2, setMultiLine2] = useState(false);
+  // const [multiLine3, setMultiLine3] = useState(false);
+  // const [numeric2, setNumeric2] = useState(false);
+  // const [numeric3, setNumeric3] = useState(false);
+  // const [imageLink2, setImageLink2] = useState(false);
+  // const [imageLink3, setImageLink3] = useState(false);
+  // const [boolean2, setBoolean2] = useState(false);
+  // const [boolean3, setBoolean3] = useState(false);
+
   useEffect(() => {
     loadInventory();
     loadItems();
   }, [id]);
 
-  const getUser = useMemo(() => {
-    const token = localStorage.getItem("token");
-    if (!token) return { id: null, role: "user" }
-    
-    try {
-      const tokenValue = token.split(".")[1];
-      console.log(tokenValue)
-      const res = JSON.parse(atob(tokenValue));
-      console.log(res)
-      return { id: res.id || null, role: res.role || "user" };
-    } catch (error) {
-      console.error("Ошибка декодирования токена:", error);
-      return { id: null, role: "user" };
-    }
+  useEffect(() => {
+    const user = getUser();
+    setCurrentUser(user);
   }, []);
-  
-  // const {role } = getUser();
- const { id: currentUserId, role: currentUserRole } = getUser;
-  // const isAdmin = role === "admin";
 
   const loadInventory = async () => {
     try {
@@ -79,6 +81,7 @@ export default function Inventory() {
       numeric1: values.numeric1 === "" ? null : Number(values.numeric1),
       numeric2: values.numeric2 === "" ? null : Number(values.numeric2),
       numeric3: values.numeric3 === "" ? null : Number(values.numeric3),
+      userId: currentUser.id,
     };
 
     try {
@@ -88,9 +91,6 @@ export default function Inventory() {
     } catch (error) {
       toast.error(error.response.data.message);
     }
-    // finally {
-    //   setLoading(false);
-    // }
   };
 
   const updateItem = async (values) => {
@@ -99,6 +99,7 @@ export default function Inventory() {
       numeric1: values.numeric1 === "" ? null : Number(values.numeric1),
       numeric2: values.numeric2 === "" ? null : Number(values.numeric2),
       numeric3: values.numeric3 === "" ? null : Number(values.numeric3),
+      userId: currentUser.id,
     };
 
     try {
@@ -115,18 +116,30 @@ export default function Inventory() {
 
   const closeModal = () => {
     setModal(false);
-    setSingleLine2(false);
-    setSingleLine3(false);
-    setMultiLine2(false);
-    setMultiLine3(false);
-    setNumeric2(false);
-    setNumeric3(false);
-    setImageLink2(false);
-    setImageLink3(false);
-    setBoolean2(false);
-    setBoolean3(false);
-    setSelected(null);
-    setEdit(false);
+    setFields({
+      singleLine2: false,
+      singleLine3: false,
+      multiLine2: false,
+      multiLine3: false,
+      numeric2: false,
+      numeric3: false,
+      imageLink2: false,
+      imageLink3: false,
+      boolean2: false,
+      boolean3: false,
+    })
+    // setSingleLine2(false);
+    // setSingleLine3(false);
+    // setMultiLine2(false);
+    // setMultiLine3(false);
+    // setNumeric2(false);
+    // setNumeric3(false);
+    // setImageLink2(false);
+    // setImageLink3(false);
+    // setBoolean2(false);
+    // setBoolean3(false);
+    // setSelected(null);
+    // setEdit(false);
   };
 
   const openEditModal = (item) => {
@@ -134,16 +147,18 @@ export default function Inventory() {
     setEdit(true);
     setModal(true);
 
-    setSingleLine2(!!item.singleLine2);
-    setSingleLine3(!!item.singleLine3);
-    setMultiLine2(!!item.multiLine2);
-    setMultiLine3(!!item.multiLine3);
-    setNumeric2(!!item.numeric2);
-    setNumeric3(!!item.numeric3);
-    setImageLink2(!!item.imageLink2);
-    setImageLink3(!!item.imageLink3);
-    setBoolean2(!!item.boolean2);
-    setBoolean3(!!item.boolean3);
+    setFields({
+    singleLine2: !!item.singleLine2,
+    singleLine3: !!item.singleLine3,
+    multiLine2: !!item.multiLine2,
+    multiLine3: !!item.multiLine3,
+    numeric2: !!item.numeric2,
+    numeric3: !!item.numeric3,
+    imageLink2: !!item.imageLink2,
+    imageLink3: !!item.imageLink3,
+    boolean2: !!item.boolean2,
+    boolean3: !!item.boolean3,
+  })
   };
 
   const deleteItem = async (itemId) => {
@@ -178,13 +193,13 @@ export default function Inventory() {
           </div>
         </div>
 
-        <div className="row my-4" style={{ border: "1px solid red" }}>
+        <div className="row my-4">
           <div className="col-md-6">
             <p>
               <strong>Описание:</strong>
             </p>
             <p>{inventory.description || "Без описания"}</p>
-            <div className="col-md-6" style={{ border: "1px solid red" }}>
+            <div className="col-md-6">
               <p>
                 <strong>Категория: </strong>
                 {inventory.category || "Без категории"}
@@ -203,7 +218,9 @@ export default function Inventory() {
 
         <div className="text-center">
           <h4>Товары в инвентаре</h4>
-          {(inventory.isPublic || (currentUserId && inventory.userId === currentUserId || currentUserRole === 'admin')) && (
+          {(inventory.isPublic ||
+            (currentUser.id && inventory.userId === currentUser.id) ||
+            currentUser.role === "admin") && (
             <button
               onClick={() => {
                 setEdit(false);
@@ -235,7 +252,7 @@ export default function Inventory() {
             <tbody>
               {items.map((item) => (
                 <tr key={item.id}>
-                  <td>{item.customId || "—"}</td>
+                  <td>{item.customId || "-"}</td>
                   <td>
                     {item.singleLine1 && <div>1: {item.singleLine1}</div>}
                     {item.singleLine2 && <div>2: {item.singleLine2}</div>}
@@ -243,53 +260,35 @@ export default function Inventory() {
                     {!item.singleLine1 &&
                       !item.singleLine2 &&
                       !item.singleLine3 &&
-                      "—"}
+                      "-"}
                   </td>
                   <td>
                     {item.numeric1 && <div>1: {item.numeric1}$</div>}
                     {item.numeric2 && <div>2: {item.numeric2}$</div>}
                     {item.numeric3 && <div>3: {item.numeric3}$</div>}
-                    {!item.numeric1 && !item.numeric2 && !item.numeric3 && "—"}
+                    {!item.numeric1 && !item.numeric2 && !item.numeric3 && "-"}
                   </td>
                   <td>
                     <div className="d-flex gap-1 flex-wrap">
                       {item.imageLink1 && (
                         <a href={item.imageLink1}>
-                          <img
-                            src={item.imageLink1}
-                            alt=" "
-                            width="40"
-                            height="40"
-                            className="object-fit-cover rounded"
-                          />
+                          <p>Пока нет</p>
                         </a>
                       )}
                       {item.imageLink2 && (
                         <a href={item.imageLink2}>
-                          <img
-                            src={item.imageLink2}
-                            alt=" "
-                            width="40"
-                            height="40"
-                            className="object-fit-cover rounded"
-                          />
+                          <p>Пока нет</p>
                         </a>
                       )}
                       {item.imageLink3 && (
                         <a href={item.imageLink3}>
-                          <img
-                            src={item.imageLink3}
-                            alt=" "
-                            width="40"
-                            height="40"
-                            className="object-fit-cover rounded"
-                          />
+                          <p>Пока нет</p>
                         </a>
                       )}
                       {!item.imageLink1 &&
                         !item.imageLink2 &&
                         !item.imageLink3 &&
-                        "—"}
+                        "-"}
                     </div>
                   </td>
                   <td>
@@ -307,10 +306,11 @@ export default function Inventory() {
                     {item.boolean1 === null &&
                       item.boolean2 === null &&
                       item.boolean3 === null &&
-                      "—"}
+                      "-"}
                   </td>
                   <td>
-                    {(currentUserRole === "admin" || item.userId === currentUserId) && (
+                    {(currentUser.role === "admin" ||
+                      item.userId === currentUser.id) && (
                       <div className="d-flex gap-2">
                         <button
                           onClick={() => openEditModal(item)}
@@ -320,8 +320,7 @@ export default function Inventory() {
                         </button>
                         <button
                           onClick={() => deleteItem(item.id)}
-                          className="btn btn-outline-danger p-2"
-                        >
+                          className="btn btn-outline-danger p-2">
                           Удалить
                         </button>
                       </div>
@@ -381,7 +380,6 @@ export default function Inventory() {
                     boolean3: Yup.boolean(),
                   })}
                   onSubmit={async (values, { resetForm }) => {
-                    // setLoading(true);
                     try {
                       if (edit) {
                         await updateItem(values);
@@ -408,17 +406,19 @@ export default function Inventory() {
                             className="form-control rounded-4 p-2"
                             placeholder="Iphone"
                           />
-                          {!singleLine2 && (
+                          {!fields.singleLine2 && (
                             <button
                               type="button"
-                              onClick={() => setSingleLine2(true)}
+                              onClick={
+                                () => setFields(prev => ({ ...prev, singleLine2: true }))
+                              }
                               className="btn btn-sm btn-outline-secondary rounded-4 mt-2 w-100"
                             >
                               + Добавить singleLine2
                             </button>
                           )}
                         </div>
-                        {singleLine2 && (
+                        {fields.singleLine2 && (
                           <div>
                             <label>SingleLine2 (Производитель)</label>
                             <Field
@@ -426,10 +426,12 @@ export default function Inventory() {
                               className="form-control rounded-4"
                               placeholder="Apple"
                             />
-                            {!singleLine3 && (
+                            {!fields.singleLine3 && (
                               <button
                                 type="button"
-                                onClick={() => setSingleLine3(true)}
+                                onClick={
+                                  () => setFields(prev => ({ ...prev, singleLine3: true }))
+                                }
                                 className="btn btn-sm btn-outline-secondary mt-2 w-100 rounded-4"
                               >
                                 + Добавить singleLine3
@@ -438,7 +440,7 @@ export default function Inventory() {
                           </div>
                         )}
 
-                        {singleLine3 && (
+                        {fields.singleLine3 && (
                           <div>
                             <label>SingleLine3 (Модель)</label>
                             <Field
@@ -462,17 +464,19 @@ export default function Inventory() {
                             placeholder="Полное описание..."
                           />
 
-                          {!multiLine2 && (
+                          {!fields.multiLine2 && (
                             <button
                               type="button"
-                              onClick={() => setMultiLine2(true)}
+                              onClick={
+                                () => setFields(prev => ({ ...prev, multiLine2: true }))
+                              }
                               className="btn btn-sm btn-outline-secondary mt-2 w-100 rounded-4"
                             >
                               + Добавить multiLine2
                             </button>
                           )}
                         </div>
-                        {multiLine2 && (
+                        {fields.multiLine2 && (
                           <div>
                             <label>MultiLine2</label>
                             <Field
@@ -481,10 +485,12 @@ export default function Inventory() {
                               className="form-control rounded-4 p-2"
                               placeholder="Дополнительно..."
                             />
-                            {!multiLine3 && (
+                            {!fields.multiLine3 && (
                               <button
                                 type="button"
-                                onClick={() => setMultiLine3(true)}
+                                onClick={
+                                  () => setFields(prev => ({ ...prev, multiLine3: true }))
+                                }
                                 className="btn btn-sm btn-outline-secondary mt-2 w-100 rounded-4"
                               >
                                 + Добавить multiLine3
@@ -493,7 +499,7 @@ export default function Inventory() {
                           </div>
                         )}
 
-                        {multiLine3 && (
+                        {fields.multiLine3 && (
                           <div>
                             <label>MultiLine3</label>
                             <Field
@@ -523,10 +529,12 @@ export default function Inventory() {
                             className="text-danger small"
                           />
 
-                          {!numeric2 && (
+                          {!fields.numeric2 && (
                             <button
                               type="button"
-                              onClick={() => setNumeric2(true)}
+                              onClick={
+                                () => setFields(prev => ({ ...prev, numeric2: true }))
+                              }
                               className="btn btn-sm btn-outline-secondary mt-2 w-100 rounded-4"
                             >
                               + Добавить numeric2
@@ -534,7 +542,7 @@ export default function Inventory() {
                           )}
                         </div>
 
-                        {numeric2 && (
+                        {fields.numeric2 && (
                           <div>
                             <label>Numeric2</label>
                             <Field
@@ -549,10 +557,12 @@ export default function Inventory() {
                               className="text-danger small"
                             />
 
-                            {!numeric3 && (
+                            {!fields.numeric3 && (
                               <button
                                 type="button"
-                                onClick={() => setNumeric3(true)}
+                                onClick={
+                                  () => setFields(prev => ({ ...prev, numeric3: true }))
+                                }
                                 className="btn btn-sm btn-outline-secondary mt-2 w-100 rounded-4"
                               >
                                 + Добавить numeric3
@@ -561,7 +571,7 @@ export default function Inventory() {
                           </div>
                         )}
 
-                        {numeric3 && (
+                        {fields.numeric3 && (
                           <div>
                             <label>Numeric3</label>
                             <Field
@@ -590,17 +600,19 @@ export default function Inventory() {
                             placeholder="https://..."
                           />
 
-                          {!imageLink2 && (
+                          {!fields.imageLink2 && (
                             <button
                               type="button"
-                              onClick={() => setImageLink2(true)}
+                              onClick={
+                                () => setFields(prev => ({ ...prev, imageLink2: true }))
+                              }
                               className="btn btn-sm btn-outline-secondary mt-2 w-100 rounded-4"
                             >
                               + Добавить imageLink2
                             </button>
                           )}
                         </div>
-                        {imageLink2 && (
+                        {fields.imageLink2 && (
                           <div>
                             <label>ImageLink2</label>
                             <Field
@@ -608,10 +620,12 @@ export default function Inventory() {
                               className="form-control rounded-4 p-2"
                               placeholder="https://..."
                             />
-                            {!imageLink3 && (
+                            {!fields.imageLink3 && (
                               <button
                                 type="button"
-                                onClick={() => setImageLink3(true)}
+                                onClick={
+                                  () => setFields(prev => ({ ...prev, imageLink3: true }))
+                                }
                                 className="btn btn-sm btn-outline-secondary mt-2 w-100 rounded-4"
                               >
                                 + Добавить imageLink3
@@ -620,7 +634,7 @@ export default function Inventory() {
                           </div>
                         )}
 
-                        {imageLink3 && (
+                        {fields.imageLink3 && (
                           <div>
                             <label>ImageLink3</label>
                             <Field
@@ -645,17 +659,19 @@ export default function Inventory() {
                               В наличии
                             </label>
                           </div>
-                          {!boolean2 && (
+                          {!fields.boolean2 && (
                             <button
                               type="button"
-                              onClick={() => setBoolean2(true)}
+                              onClick={
+                                () => setFields(prev => ({ ...prev, boolean2: true }))
+                              }
                               className="btn btn-sm btn-outline-secondary mt-2 w-100 rounded-4"
                             >
                               + Добавить boolean2
                             </button>
                           )}
                         </div>
-                        {boolean2 && (
+                        {fields.boolean2 && (
                           <div>
                             <div className="form-check">
                               <Field
@@ -671,10 +687,12 @@ export default function Inventory() {
                                 Нет в наличии
                               </label>
                             </div>
-                            {!boolean3 && (
+                            {!fields.boolean3 && (
                               <button
                                 type="button"
-                                onClick={() => setBoolean3(true)}
+                                onClick={
+                                  () => setFields(prev => ({ ...prev, boolean3: true }))
+                                }
                                 className="btn btn-sm btn-outline-secondary mt-2 w-100 rounded-4"
                               >
                                 + Добавить boolean3
@@ -682,7 +700,7 @@ export default function Inventory() {
                             )}
                           </div>
                         )}
-                        {boolean3 && (
+                        {fields.boolean3 && (
                           <div>
                             <div className="form-check">
                               <Field
@@ -702,28 +720,20 @@ export default function Inventory() {
                         )}
                       </div>
                     </div>
-                    <div
-                      className="modal-footer d-flex justify-content-between"
-                      style={{ border: "1px solid red" }}
-                    >
+                    <div className="modal-footer d-flex justify-content-between">
                       <button
                         type="button"
                         onClick={() => setModal(false)}
-                        className="btn btn-secondary rounded-4"
-                      >
+                        className="btn btn-secondary rounded-4">
                         Отмена
                       </button>
                       <button
                         type="submit"
-                        className="btn btn-success rounded-4"
-                      >
+                        className="btn btn-success rounded-4" >
                         {loading
-                          ? edit
-                            ? "Сохраняю..."
-                            : "Добавляю..."
-                          : edit
-                          ? "Сохранить"
-                          : "Добавить"}
+                          ? edit ? "Сохраняю..." : "Добавляю..."
+                          : edit ? "Сохранить" : "Добавить"
+                        }
                       </button>
                     </div>
                   </Form>

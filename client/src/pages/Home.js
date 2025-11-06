@@ -5,28 +5,32 @@ import * as Yup from "yup";
 import api from "../services/api";
 import { toast } from "react-toastify";
 
+import { getUser } from "../utils/getUser";
+
 export default function Home() {
   const [inventories, setInventories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [modal, setModal] = useState(false);
-  // const [error, setError] = useState("");
+  const [currentUser, setCurrentUser] = useState({ id: null, role: "user" });
+  const [token, setToken] = useState(localStorage.getItem("token"));
 
   const navigate = useNavigate();
 
-  
-  
-  
+  // useEffect(() => {
+  //   loadInventories();
+  // }, []);
+
   useEffect(() => {
     loadInventories();
-  }, []);
-
+    const user = getUser();
+    setCurrentUser(user);
+  }, [token]);
 
   const loadInventories = async () => {
     try {
       const res = await api.get("/inventory");
       setInventories(res.data);
     } catch (error) {
-      // const message = error.response.data.message;
       toast.error(error.response.data.message);
     } finally {
       setLoading(false);
@@ -50,8 +54,7 @@ export default function Home() {
       setModal(false);
       toast.success("Инвентарь создан");
     } catch (error) {
-      // const message = error.response.data.message;
-      toast.error("Ошибка создания инвентаря");
+      toast.error(error.response.data.message);
     } finally {
       setLoading(false);
     }
@@ -75,23 +78,23 @@ export default function Home() {
     try {
       await api.delete("/delete");
       localStorage.removeItem("token");
-      toast.success("Вы вышли из аккаунта");
+      toast.success("Вы удалили свой аккаунт");
       navigate("/login");
     } catch (error) {
       toast.error(error.response.data.message);
     }
   };
 
-  // const exitAdmin = async () => {
-  //   try {
-  //     const res = await api.post('/exit-admin');
-  //     localStorage.setItem('token', res.data.token);
-  //     toast.success('Вы вышли из режима админа');
-  //     // window.location.reload();
-  //   } catch (error) {
-  //     toast.error('Ошибка выхода из админа');
-  //   }
-  // };
+  const exitAdmin = async () => {
+    try {
+      const res = await api.post("/exit-admin");
+      localStorage.setItem("token", res.data.token);
+      toast.success("Вы вышли из режима админа");
+      setToken(res.data.token);
+    } catch (error) {
+      toast.error("Ошибка выхода из админа");
+    }
+  };
 
   const deleteInventory = async (id) => {
     const confirmDelete = window.confirm(
@@ -109,33 +112,27 @@ export default function Home() {
   };
 
   return (
-    <div
-      className="min-vh-100"
-      style={{ backgroundColor: "#f0f2f5", border: "1px solid red" }}
-    >
-      <div className="bg-white" style={{ border: "1px solid red" }}>
+    <div className="min-vh-100" style={{ backgroundColor: "#f0f2f5" }}>
+      <div className="bg-white">
         <div className="container p-4">
           <div className="d-flex justify-content-between align-items-center">
             <h1 className="m-0">Мои инвентари</h1>
-            <div className="d-flex gap-3" style={{ border: "1px solid red" }}>
+            <div className="d-flex gap-3">
               <button
                 onClick={logout}
-                className="btn btn-outline-dark btn-lg fs-5 rounded-4 px-4"
-              >
+                className="btn btn-outline-dark btn-lg fs-5 rounded-4 px-4">
                 Выйти
               </button>
-              {/* {isAdmin && (
+              {currentUser.role === "admin" && (
                 <button
                   onClick={exitAdmin}
-                  className="btn btn-warning btn-lg fs-5 rounded-4 px-4"
-                >
+                  className="btn btn-outline-warning btn-lg fs-5 rounded-4 px-4">
                   Выйти из админа
                 </button>
-              )} */}
+              )}
               <button
                 onClick={deleteAccount}
-                className="btn btn-outline-danger btn-lg fs-5 rounded-4 px-4"
-              >
+                className="btn btn-outline-danger btn-lg fs-5 rounded-4 px-4">
                 Удалить аккаунт
               </button>
             </div>
@@ -143,17 +140,16 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="container py-3" style={{ border: "1px solid red" }}>
+      <div className="container py-3">
         <div className="text-end">
           <button
             onClick={() => setModal(true)}
-            className="btn btn-outline-success btn-lg fs-5 mx-2"
-          >
+            className="btn btn-outline-success btn-lg fs-5 mx-2">
             Создать
           </button>
         </div>
 
-        <div className="row g-3" style={{ border: "1px solid green" }}>
+        <div className="row g-3">
           {inventories.map((item) => (
             <div className="col-md-6 col-lg-4" key={item.id}>
               <div className="card h-100 shadow rounded-4 overflow-hidden m-2">
@@ -164,17 +160,17 @@ export default function Home() {
                 <div className="m-2">
                   <Link
                     className="btn btn-outline-info w-100"
-                    to={`/inventory/${item.id}`}
-                  >
+                    to={`/inventory/${item.id}`}>
                     Открыть
                   </Link>
                 </div>
-                <button
-                  className="btn btn-outline-danger m-2"
-                  onClick={() => deleteInventory(item.id)}
-                >
-                  Удалить
-                </button>
+                {currentUser.role === "admin" && (
+                  <button
+                    className="btn btn-outline-danger m-2"
+                    onClick={() => deleteInventory(item.id)}>
+                    Удалить
+                  </button>
+                )}
               </div>
             </div>
           ))}
@@ -184,17 +180,10 @@ export default function Home() {
       {modal && (
         <div
           className="modal show d-block"
-          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-        >
-          <div className="modal-dialog" style={{ border: "1px solid red" }}>
-            <div
-              className="modal-content rounded-4 shadow "
-              style={{ border: "1px solid red" }}
-            >
-              <div
-                className="modal-header d-flex flex-column"
-                style={{ border: "1px solid green" }}
-              >
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+          <div className="modal-dialog">
+            <div className="modal-content rounded-4 shadow ">
+              <div className="modal-header d-flex flex-column">
                 <button
                   onClick={() => setModal(false)}
                   className="btn btn-close"
@@ -224,49 +213,41 @@ export default function Home() {
               >
                 <Form>
                   <div className="modal-body ">
-                    {/* <div> */}
-                    <label htmlFor="form-label">Название инвентаря</label>
+                    <label>Название инвентаря</label>
                     <Field
                       type="text"
                       name="title"
                       className="form-control rounded-4 p-2"
-                      placeholder="Введите название"
-                    />
+                      placeholder="Введите название"/>
                     <ErrorMessage
                       name="title"
                       component="div"
-                      className="text-danger small"
-                    />
-                    {/* </div> */}
+                      className="text-danger small"/>
 
                     <div className="mb-3">
-                      <label className="form-label">Описание</label>
+                      <label>Описание</label>
                       <Field
                         as="textarea"
                         name="description"
                         className="form-control rounded-4 p-2"
-                        placeholder="Введите описание (необязательно)"
-                      />
-                      {/* <ErrorMessage
+                        placeholder="Введите описание (необязательно)"/>
+                      <ErrorMessage
                         name="description"
                         component="div"
-                        className="text-danger small"
-                      /> */}
+                        className="text-danger small"/>
                     </div>
 
                     <div className="mb-3">
-                      <label className="form-label">Категория</label>
+                      <label>Категория</label>
                       <Field
                         type="text"
                         name="category"
                         className="form-control rounded-4 p-2"
-                        placeholder="Категория (например, Склад)"
-                      />
+                        placeholder="Категория (например, Склад)"/>
                       <ErrorMessage
                         name="category"
                         component="div"
-                        className="text-danger small"
-                      />
+                        className="text-danger small"/>
                     </div>
 
                     <div className="form-check">
@@ -277,27 +258,23 @@ export default function Home() {
                         type="checkbox"
                         name="isPublic"
                         className="form-check-input"
-                        style={{ cursor: "pointer" }}
-                      />
-                      {/* <ErrorMessage
+                        style={{ cursor: "pointer" }}/>
+                      <ErrorMessage
                         name="isPublic"
                         component="div"
-                        className="text-danger small"
-                      />                 */}
+                        className="text-danger small"/>                
                     </div>
 
                     <div className="modal-footer d-flex justify-content-between">
                       <button
                         type="button"
                         onClick={() => setModal(false)}
-                        className="btn btn-secondary rounded-4"
-                      >
+                        className="btn btn-secondary rounded-4">
                         Отмена
                       </button>
                       <button
                         type="submit"
-                        className="btn btn-success rounded-4"
-                      >
+                        className="btn btn-success rounded-4">
                         {loading ? "Создаю..." : "Создать"}
                       </button>
                     </div>
