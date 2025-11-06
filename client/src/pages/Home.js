@@ -230,7 +230,7 @@ export default function Home() {
                         as="textarea"
                         name="description"
                         className="form-control rounded-4 p-2"
-                        placeholder="Введите описание (необязательно)"/>
+                        placeholder="Введите описание"/>
                       <ErrorMessage
                         name="description"
                         component="div"
