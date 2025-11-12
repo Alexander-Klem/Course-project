@@ -12,16 +12,10 @@ class ItemController {
         return next(ApiError.badRequest("Инвентарь не найден"));
       }
 
-      // if (inventory.userId !== req.user.id && req.user.role !== "ADMIN") {
-      //   return next(ApiError.forbidden("Нет прав"));
-      // }
-
-      if (!inventory.isPublic && inventory.userId !== userId) {
-        return res
-          .status(403)
-          .json({
-            message: "У вас нет доступа добавлять товары в этот инвентарь",
-          });
+      if (!inventory.isPublic && inventory.userId !== req.user.id) {
+        return res.status(403).json({
+          message: "У вас нет доступа добавлять товары в этот инвентарь",
+        });
       }
 
       const nextId = (await Item.count({ where: { inventoryId } })) + 1;

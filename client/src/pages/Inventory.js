@@ -82,7 +82,6 @@ export default function Inventory() {
       numeric1: values.numeric1 === "" ? null : Number(values.numeric1),
       numeric2: values.numeric2 === "" ? null : Number(values.numeric2),
       numeric3: values.numeric3 === "" ? null : Number(values.numeric3),
-      userId: currentUser.id,
     };
 
     try {
@@ -100,7 +99,6 @@ export default function Inventory() {
       numeric1: values.numeric1 === "" ? null : Number(values.numeric1),
       numeric2: values.numeric2 === "" ? null : Number(values.numeric2),
       numeric3: values.numeric3 === "" ? null : Number(values.numeric3),
-      userId: currentUser.id,
     };
 
     try {
