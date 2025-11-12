@@ -42,16 +42,6 @@ export default function Inventory() {
   // const [boolean2, setBoolean2] = useState(false);
   // const [boolean3, setBoolean3] = useState(false);
 
-  useEffect(() => {
-    loadInventory();
-    loadItems();
-  }, [id, loadInventory, loadItems]);
-
-  useEffect(() => {
-    const user = getUser();
-    setCurrentUser(user);
-  }, []);
-
   const loadInventory = async () => {
     try {
       const res = await api.get(`/inventory/${id}`);
@@ -74,6 +64,19 @@ export default function Inventory() {
       setLoading(false);
     }
   };
+
+  // loadInventory, loadItems
+
+  useEffect(() => {
+    loadInventory();
+    loadItems();
+  }, [id]);
+
+  useEffect(() => {
+    const user = getUser();
+    setCurrentUser(user);
+  }, []);
+
 
   const addItem = async (values) => {
     const preparedValues = {
