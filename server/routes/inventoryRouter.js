@@ -8,6 +8,6 @@ router.post('/', authMiddleware, inventoryController.create);
 router.get('/', authMiddleware, inventoryController.getAll); 
 router.get('/:id', authMiddleware, inventoryController.getOne); 
 router.put('/:id', authMiddleware, inventoryController.update);
-router.delete('/:id', authMiddleware, inventoryController.delete); // только администраторы
+router.delete('/:id', authMiddleware, inventoryController.delete);
 
 module.exports = router;

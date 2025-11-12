@@ -220,7 +220,7 @@ export default function Inventory() {
           <h4>Товары в инвентаре</h4>
           {(inventory.isPublic ||
             (currentUser.id && inventory.userId === currentUser.id) ||
-            currentUser.role === "admin") && (
+            currentUser.id && currentUser.role === "admin") && (
             <button
               onClick={() => {
                 setEdit(false);

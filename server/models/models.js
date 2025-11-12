@@ -20,7 +20,7 @@ const Inventory = sequelize.define('inventory', {
     isPublic: { type: DataTypes.BOOLEAN },
     version: { type: DataTypes.INTEGER }, 
     imageUrl: { type: DataTypes.STRING }, 
-    tags: { type: DataTypes.JSON, defaultValue: [] }, 
+    // tags: { type: DataTypes.JSON, defaultValue: [] }, 
     customIdFormat: { type: DataTypes.STRING, defaultValue: 'item-{id}' }
 });
 
