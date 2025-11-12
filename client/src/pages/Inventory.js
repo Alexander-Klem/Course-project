@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -45,7 +45,7 @@ export default function Inventory() {
   useEffect(() => {
     loadInventory();
     loadItems();
-  }, [id]);
+  }, [id, loadInventory, loadItems]);
 
   useEffect(() => {
     const user = getUser();
@@ -220,7 +220,8 @@ export default function Inventory() {
           <h4>Товары в инвентаре</h4>
           {(inventory.isPublic ||
             (currentUser.id && inventory.userId === currentUser.id) ||
-            currentUser.id && currentUser.role === "admin") && (
+            (currentUser.id && currentUser.role === "admin")
+          ) && (
             <button
               onClick={() => {
                 setEdit(false);
