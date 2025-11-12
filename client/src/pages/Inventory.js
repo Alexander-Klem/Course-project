@@ -65,12 +65,10 @@ export default function Inventory() {
     }
   };
 
-  // loadInventory, loadItems
-
   useEffect(() => {
     loadInventory();
     loadItems();
-  }, [id]);
+  }, [id, loadInventory, loadItems]);
 
   useEffect(() => {
     const user = getUser();
