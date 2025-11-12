@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -42,7 +42,7 @@ export default function Inventory() {
   // const [boolean2, setBoolean2] = useState(false);
   // const [boolean3, setBoolean3] = useState(false);
 
-  const loadInventory = async () => {
+  const loadInventory = useCallback(async () => {
     try {
       const res = await api.get(`/inventory/${id}`);
       setInventory(res.data);
@@ -52,9 +52,9 @@ export default function Inventory() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, navigate]);
 
-  const loadItems = async () => {
+  const loadItems = useCallback(async () => {
     try {
       const res = await api.get(`/items/${id}`);
       setItems(res.data);
@@ -63,7 +63,7 @@ export default function Inventory() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     loadInventory();
